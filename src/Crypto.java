@@ -1,11 +1,15 @@
 public class Crypto {
 
+    // Applies two rounds of (transposition->substitution)
+    // in the right direction
     public static String encrypt (String plainText, int key) {
 
         String round1 = substitute(transpose(plainText,key,Direction.RIGHT),key,Direction.RIGHT);
         return substitute(transpose(round1,key,Direction.RIGHT),key,Direction.RIGHT);
     }
 
+    // Applies two rounds of (substitution->transposition)
+    // in the left direction
     public static String decrypt (String cipherText, int key) {
 
         String round1 = transpose(substitute(cipherText,key,Direction.LEFT),key,Direction.LEFT);
@@ -32,13 +36,17 @@ public class Crypto {
                 break;
         }
 
+        // Process each chunk of 8 letters
         for(int i = 0; i < nChunks; i++) {
             String chunk = text.substring(8*i,8*i + 8);
             StringBuilder transposedChunk = new StringBuilder();
 
+            // Append shifted letter to new string
             for(int j = 0; j < 8; j++) {
                 transposedChunk.append(chunk.charAt((j+shift) % 8));
             }
+
+            // Append new string to transposed string
             transposedString.append(transposedChunk.toString());
         }
 
@@ -49,6 +57,7 @@ public class Crypto {
 
         StringBuilder substitutedString = new StringBuilder();
 
+        // Rotate each character based on key and direction
         for(int i = 0; i < text.length(); i++) {
             char rotatedChar = rotateChar(text.charAt(i),key % 26,direction);
             substitutedString.append(rotatedChar);
@@ -62,6 +71,11 @@ public class Crypto {
         char result = c;
 
         for(int i = 0; i < rotations; i++) {
+
+            // Letters cycle through the alphabet and then loop around
+            // rotateChar('Z',1,right) -> 'A'
+            // rotateChar('A',1,left) -> 'Z'
+
             switch (direction) {
                 case LEFT:
                     if (result == 'A')

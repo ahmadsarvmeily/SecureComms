@@ -7,6 +7,7 @@ public class CipherTextProxy {
 
     private CiphertextInterface ctstub;
 
+    // Obtains reference to remote CiphertextInterface object
     CipherTextProxy() {
         try {
             System.setProperty( "java.security.policy", "mypolicy" );
@@ -21,6 +22,7 @@ public class CipherTextProxy {
         }
     }
 
+    // Fetches cipher text from remote CiphertextInterface object
     public String get(String userID, int key) throws RemoteException {
         return ctstub.get(userID,key);
     }

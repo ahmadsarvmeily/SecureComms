@@ -9,6 +9,7 @@ public class MyServer {
 
         CipherTextProxy cipherTextProxy = new CipherTextProxy();
         try {
+            // Bind server to RMI registry
             Naming.rebind("MyServer", new ServerImpl(prime, primitiveRoot, cipherTextProxy));
             System.out.println("MyServer is ready.");
 
