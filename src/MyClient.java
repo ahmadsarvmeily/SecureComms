@@ -7,8 +7,8 @@ public class MyClient {
 
     public static void main(String[] args) {
 
-        String username = "as20g16";//args[1];
-        String serverName = "localhost"; //args[0];
+        String username = args[1];
+        String serverName = args[0];
 
         try {
 
