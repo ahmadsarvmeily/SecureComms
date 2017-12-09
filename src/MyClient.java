@@ -38,6 +38,7 @@ public class MyClient {
             String cipherText = serverHandle.getCipherText(client, username);
             System.out.println("Cipher text: "+cipherText);
             System.out.println("Plain text: "+Crypto.decrypt(cipherText,key));
+            System.exit(0);
         }
         catch (RemoteException e) {
             e.printStackTrace();
