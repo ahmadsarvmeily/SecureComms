@@ -20,9 +20,12 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
 
     @Override
     public void requestSecureConnection(ClientInterface client) throws RemoteException {
+
         KeyGenerator keyGen = new KeyGenerator(prime,primRoot);
         int y = client.getValue();
         int key = keyGen.generateKey(y);
+
+        System.out.println("Secret shared key established.");
 
         synchronized (this) {
             keyMap.put(client, key);
@@ -31,6 +34,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         synchronized (this) {
             valueMap.put(client, keyGen.generateValue());
         }
+        System.out.println("Secure connection established.");
     }
 
     @Override
@@ -54,6 +58,7 @@ public class ServerImpl extends UnicastRemoteObject implements ServerInterface {
         synchronized (this) {
             key = keyMap.get(client);
         }
+        System.out.println("Sending cipher text to "+userID+"...");
         return proxy.get(userID,key);
     }
 }
