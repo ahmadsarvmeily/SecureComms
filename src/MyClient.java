@@ -1,32 +1,45 @@
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.InetAddress;
-import java.net.Socket;
+import java.net.MalformedURLException;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 
 public class MyClient {
 
     public static void main(String[] args) {
 
-        //String serverName = args[0];
-        //String username = args[1];
+        String username = "as20g16";//args[1];
+        String serverName = "localhost"; //args[0];
 
-        Socket socket;
         try {
-            socket = new Socket(InetAddress.getLocalHost(), 5137);
-            InputStream serverInputStream = socket.getInputStream();
-            OutputStream serverOutputStream = socket.getOutputStream();
 
-            int x = serverInputStream.read();
-            int prime = serverInputStream.read();
-            int primitiveRoot = serverInputStream.read();
+            ServerInterface serverHandle = null;
+            try {
+                serverHandle =(ServerInterface) Naming.lookup("//" + serverName + "/MyServer");
+            } catch (NotBoundException | MalformedURLException e) {
+                e.printStackTrace();
+            }
 
-            KeyGenerator generator = new KeyGenerator(prime,primitiveRoot);
-            int y = generator.generateValue();
-            serverOutputStream.write(y);
-            int key = generator.generateKey(x);
-            System.out.println(key);
-        } catch (IOException e) {
+            String serverHandleStatus = serverHandle != null ? "[ OK ]" : "[FAIL]";
+            System.out.println(serverHandleStatus + " Obtain server handle");
+
+            int prime = serverHandle.getPrime();
+            int primRoot = serverHandle.getPrimRoot();
+
+            KeyGenerator clientKeyGen = new KeyGenerator(prime,primRoot);
+            ClientInterface client = new ClientImpl(clientKeyGen.generateValue());
+            System.out.println("Requesting secure connection...");
+            serverHandle.requestSecureConnection(client);
+
+            int x = serverHandle.getValue(client);
+
+            int key = clientKeyGen.generateKey(x);
+            System.out.println("Secret shared key established.");
+            System.out.println("Fetching cipher text...\n");
+            String cipherText = serverHandle.getCipherText(client, username);
+            System.out.println("Cipher text: "+cipherText);
+            System.out.println("Plain text: "+Crypto.decrypt(cipherText,key));
+        }
+        catch (RemoteException e) {
             e.printStackTrace();
         }
     }
